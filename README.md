@@ -7,28 +7,38 @@ This application provides the following functionality:
 
 * RESTful web service that performs JNDI lookups.
  
-	* http://localhost:8080/direct
-	* http://localhost:8080/factoryBean
-	* http://localhost:8080/directFromUtil
-	* http://localhost:8080/factoryBeanFromUtil
+```
+urls:
+http://localhost:8080/direct
+http://localhost:8080/factoryBean
+http://localhost:8080/directFromUtil
+http://localhost:8080/factoryBeanFromUtil
+```
 
 * Scheduled task that performs JNDI lookups.
 
 * (Apache CXF) SOAP web service that performs JNDI lookups.
  
-	* http://localhost:8080/services/SampleManager?wsdl
-	
-	** echo
-	** direct
-	** factoryBean
-	** directFromBridge
-	** factoryBeanFromBridge
+```
+wsdl url:
+http://localhost:8080/services/SampleManager?wsdl
 
-	* Please note the direct and directFromBridge operations currently return the following errors, respectively, at runtime:
-	
-	** Name [java:comp/env/jdbc/myDataSource] is not bound in this Context. Unable to find [java:comp].
-	** NamingException: javax.naming.NameNotFoundException: Name [java:comp/env/jdbc/myDataSource] is not bound in this Context. Unable to find [java:comp].
- 
+operations:
+echo
+direct
+factoryBean
+directFromBridge
+factoryBeanFromBridge
+```
+
+* Please note the direct and directFromBridge operations currently return the following errors at runtime:
+
+```
+Name [java:comp/env/jdbc/myDataSource] is not bound in this Context. Unable to find [java:comp].
+
+NamingException: javax.naming.NameNotFoundException: Name [java:comp/env/jdbc/myDataSource] is not bound in this Context. Unable to find [java:comp].
+```
+
 
 ## Development
 ----------
@@ -67,7 +77,6 @@ java -jar ${APP_NAME}
 ## Building
 ----------
 
-### Building
 Run the command below to build an executable jar.
 
 ```
