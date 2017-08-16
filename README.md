@@ -1,5 +1,4 @@
 # Tomcat JNDI with Scheduler and Apache CXF Web Service
-----------
 
 This application provides the following functionality:
 
@@ -41,7 +40,6 @@ NamingException: javax.naming.NameNotFoundException: Name [java:comp/env/jdbc/my
 
 
 ## Development
-----------
 
 ### Requirements
 * [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or later
@@ -75,7 +73,6 @@ java -jar ${APP_NAME}
   
 
 ## Building
-----------
 
 Run the command below to build an executable jar.
 
@@ -85,7 +82,6 @@ Run the command below to build an executable jar.
 
 
 ## Misc.
-----------
 
 ### Property file(s)
 The application expects there to be a property file called "application.properties" that is located in the same directory the application is located.  If the property file it is not present, then the application will used the bundled property file. 
