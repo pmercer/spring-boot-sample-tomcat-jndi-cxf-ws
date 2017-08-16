@@ -1,0 +1,56 @@
+buildscript {
+	ext {
+		springBootVersion = '1.5.6.RELEASE'
+
+		// Apache CXF Artifacts
+		cxfVersion = "3.1.12"
+
+	    cxfArtifacts = [
+	            'cxf-rt-frontend-jaxws',
+	            'cxf-rt-transports-http',
+	            'cxf-rt-databinding-xmlbeans'
+	    ]
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+
+jar {
+	baseName = 'sample-application'
+	version = ''
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+springBoot {
+	executable = true
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-web-services')
+
+	// https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-dbcp
+	compile group: 'org.apache.tomcat', name: 'tomcat-dbcp', version: '8.5.16'
+
+	// https://mvnrepository.com/artifact/commons-lang/commons-lang
+	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+
+    cxfArtifacts.each { artifact ->
+        compile "org.apache.cxf:$artifact:$cxfVersion"
+    }
+	
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
