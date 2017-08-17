@@ -2,14 +2,8 @@ buildscript {
 	ext {
 		springBootVersion = '1.5.6.RELEASE'
 
-		// Apache CXF Artifacts
+		// Apache CXF
 		cxfVersion = "3.1.12"
-
-	    cxfArtifacts = [
-	            'cxf-rt-frontend-jaxws',
-	            'cxf-rt-transports-http',
-	            'cxf-rt-databinding-xmlbeans'
-	    ]
 	}
 	repositories {
 		mavenCentral()
@@ -48,9 +42,11 @@ dependencies {
 	// https://mvnrepository.com/artifact/commons-lang/commons-lang
 	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
-    cxfArtifacts.each { artifact ->
-        compile "org.apache.cxf:$artifact:$cxfVersion"
-    }
-	
+	// https://mvnrepository.com/artifact/org.apache.cxf/cxf-spring-boot-starter-jaxws
+	compile group: 'org.apache.cxf', name: 'cxf-spring-boot-starter-jaxws', version: "${cxfVersion}"
+
+	// https://mvnrepository.com/artifact/org.apache.cxf/cxf-rt-databinding-xmlbeans
+	compile group: 'org.apache.cxf', name: 'cxf-rt-databinding-xmlbeans', version: "${cxfVersion}"
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
