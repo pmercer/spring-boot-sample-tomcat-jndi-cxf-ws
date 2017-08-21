@@ -21,44 +21,49 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import sample.tomcat.jndi.utils.SampleUtil;
+import sample.tomcat.jndi.config.DataSources;
+import sample.tomcat.jndi.utils.DataSourceUtil;
 
 @Controller
 public class SampleController {
 
 	@Autowired
-	private DataSource dataSource;
+	private Environment env;
+	
+	@Autowired
+	private DataSources dataSources;
 
 	@Autowired
-	private SampleUtil sampleUtil;
+	private DataSourceUtil dataSourceUtil;
 	
 	@RequestMapping("/factoryBean")
 	@ResponseBody
 	public String factoryBean() throws NamingException {
-		return "DataSource retrieved from JNDI using JndiObjectFactoryBean: " + dataSource;
+		return "DataSource retrieved from JNDI using JndiObjectFactoryBean: " + dataSources.getDataSource(env.getProperty("jdbc.abc.datasource.name"));
 	}
 
 	@RequestMapping("/direct")
 	@ResponseBody
 	public String direct() throws NamingException {
 		return "DataSource retrieved directly from JNDI: " +
-				new InitialContext().lookup("java:comp/env/jdbc/myDataSource");
+				new InitialContext().lookup(String.format("java:comp/env/%s", env.getProperty("jdbc.abc.datasource.name")));
 	}
 	
 	@RequestMapping("/factoryBeanFromUtil")
 	@ResponseBody
 	public String factoryBeanFromUtil() throws NamingException {
-		return sampleUtil.getDataSourcefromFactoryBean();
+		return dataSourceUtil.getDataSourcefromFactoryBean(env.getProperty("jdbc.abc.datasource.name")).toString();
 	}
 
 	@RequestMapping("/directFromUtil")
 	@ResponseBody
 	public String directFromUtil() throws NamingException {
-		return sampleUtil.getDataSourcefromJNDI();
+		return dataSourceUtil.getDataSourcefromJNDI(env.getProperty("jdbc.abc.datasource.name")).toString();
 	}
 
 }

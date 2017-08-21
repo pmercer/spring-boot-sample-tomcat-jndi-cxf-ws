@@ -5,7 +5,6 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.ServiceMode;
@@ -13,8 +12,10 @@ import javax.xml.ws.ServiceMode;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.feature.Features;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 
-import sample.tomcat.jndi.config.SampleUtilService;
+import sample.tomcat.jndi.config.DataSourceService;
+import sample.tomcat.jndi.config.DataSources;
 import sample.tomcat.jndi.config.SpringContextBridge;
 
 @WebService(
@@ -28,8 +29,11 @@ import sample.tomcat.jndi.config.SpringContextBridge;
 public class SampleManager {
 
 	@Autowired
-	private DataSource dataSource;
-    
+	private Environment env;
+	
+	@Autowired
+	private DataSources dataSources;
+	
 	@WebMethod(operationName="echo")
 	public String echo(
 			@XmlElement(required=true) @WebParam(name="input") String input)
@@ -38,23 +42,23 @@ public class SampleManager {
 	}
 
 	@WebMethod(operationName="factoryBean")
-	public String factoryBean() {
-		return "DataSource retrieved from JNDI using JndiObjectFactoryBean: " + dataSource;
+	public String factoryBean() throws IllegalArgumentException, NamingException {
+		return "DataSource retrieved from JNDI using JndiObjectFactoryBean: " + dataSources.getDataSource(env.getProperty("jdbc.abc.datasource.name"));
 	}
 
 	@WebMethod(operationName="direct")
 	public String direct() throws NamingException {
 		return "DataSource retrieved directly from JNDI: " +
-				new InitialContext().lookup("java:comp/env/jdbc/myDataSource");
+				new InitialContext().lookup(String.format("java:comp/env/%s", env.getProperty("jdbc.abc.datasource.name")));
 	}
 	
 	@WebMethod(operationName="factoryBeanFromBridge")
 	public String factoryBeanFromBridge() {
-		// Get the SampleUtilService from the Bridge
-		SampleUtilService sampleUtilService = SpringContextBridge.services().getSampleUtilService();
+		// Get the DataSourceService from the Bridge
+		DataSourceService dataSourceService = SpringContextBridge.services().getDataSourceService();
 		
 		try {
-			return sampleUtilService.getDataSourcefromFactoryBean();
+			return dataSourceService.getDataSourcefromFactoryBean(env.getProperty("jdbc.abc.datasource.name")).toString();
 		} catch (NamingException e) {
 			return "NamingException: " + e;
 		}
@@ -62,11 +66,11 @@ public class SampleManager {
 
 	@WebMethod(operationName="directFromBridge")
 	public String directFromBridge() throws NamingException {
-		// Get the SampleUtilService from the Bridge
-		SampleUtilService sampleUtilService = SpringContextBridge.services().getSampleUtilService();
+		// Get the DataSourceService from the Bridge
+		DataSourceService dataSourceService = SpringContextBridge.services().getDataSourceService();
 		
 		try {
-			return sampleUtilService.getDataSourcefromJNDI();
+			return dataSourceService.getDataSourcefromJNDI(env.getProperty("jdbc.abc.datasource.name")).toString();
 		} catch (NamingException e) {
 			return "NamingException: " + e;
 		}

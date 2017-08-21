@@ -17,7 +17,7 @@ public class SpringContextBridge implements SpringContextBridgedServices, Applic
 	private static ApplicationContext applicationContext;
 
 	@Autowired
-	private SampleUtilService sampleUtilService; // Autowire the SampleUtilService
+	private DataSourceService dataSourceService; // Autowire the DataSourceService
 	
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -37,8 +37,8 @@ public class SpringContextBridge implements SpringContextBridgedServices, Applic
 	}
 
 	@Override
-	public SampleUtilService getSampleUtilService() {
-		return sampleUtilService; // Return the Autowired SampleUtilService
+	public DataSourceService getDataSourceService() {
+		return dataSourceService; // Return the Autowired DataSourceService
 	}
 	
 }

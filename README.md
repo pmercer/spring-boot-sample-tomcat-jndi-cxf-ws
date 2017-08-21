@@ -96,7 +96,7 @@ The logging file properties can be set in the application's property file.
 ./gradlew clean test
 ```
 
-* please note all the Apache CXF SOAP web service tests that perform JNDI lookups are currently failing:
+* please note the Apache CXF SOAP web service tests that perform the direct JNDI lookups are failing:
 
 ```
 :test
@@ -107,13 +107,7 @@ sample.tomcat.jndi.web.SampleManagerTests > direct FAILED
 sample.tomcat.jndi.web.SampleManagerTests > directFromBridge FAILED
     java.lang.AssertionError at SampleManagerTests.java:90
 
-sample.tomcat.jndi.web.SampleManagerTests > factoryBean FAILED
-    org.springframework.ws.soap.client.SoapFaultClientException at SampleManagerTests.java:65
-
-sample.tomcat.jndi.web.SampleManagerTests > factoryBeanFromBridge FAILED
-    org.springframework.ws.soap.client.SoapFaultClientException at SampleManagerTests.java:81
-
-10 tests completed, 4 failed
+10 tests completed, 2 failed
 :test FAILED
 ```
  

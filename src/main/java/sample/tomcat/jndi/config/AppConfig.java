@@ -2,6 +2,7 @@ package sample.tomcat.jndi.config;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -20,11 +21,12 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.core.env.Environment;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import sample.tomcat.jndi.utils.SampleUtil;
+import sample.tomcat.jndi.utils.DataSourceUtil;
 
 @Configuration
 @EnableScheduling
@@ -32,9 +34,12 @@ import sample.tomcat.jndi.utils.SampleUtil;
 public class AppConfig {
 	
 	private static final Logger log = LoggerFactory.getLogger(AppConfig.class); 
+
+	@Autowired
+	private Environment env;
 	
 	@Autowired
-	private SampleUtil sampleUtil;
+	private DataSourceUtil dataSourceUtil;
 	
 	public static int port;
 
@@ -48,8 +53,9 @@ public class AppConfig {
         log.info("Running scheduled task at {}", dateFormat.format(new Date()));
 
         try {
-			sampleUtil.getDataSourcefromJNDI();
-			sampleUtil.getDataSourcefromFactoryBean();
+			String db = env.getProperty("jdbc.abc.datasource.name");
+			dataSourceUtil.getDataSourcefromJNDI(db);
+			dataSourceUtil.getDataSourcefromFactoryBean(db);
         } catch (NamingException e) {
 			e.printStackTrace();
 		}
@@ -101,25 +107,52 @@ public class AppConfig {
 
 			@Override
 			protected void postProcessContext(Context context) {
+				
+				// Abc datasource
 				ContextResource resource = new ContextResource();
-				resource.setName("jdbc/myDataSource");
+				resource.setName(env.getProperty("jdbc.abc.datasource.name"));
 				resource.setType(DataSource.class.getName());
-				resource.setProperty("driverClassName", "your.db.Driver");
-				resource.setProperty("url", "jdbc:yourDb");
+				resource.setProperty("driverClassName", env.getProperty("jdbc.abc.datasource.driver"));
+				resource.setProperty("url", env.getProperty("jdbc.abc.datasource.url"));
+				resource.setProperty("username", env.getProperty("jdbc.abc.datasource.username"));
+				resource.setProperty("password", env.getProperty("jdbc.abc.datasource.password"));
 				context.getNamingResources().addResource(resource);
+
+				// other datasources ...
 			}
 			
 		};
 	}
 
-	@Bean(destroyMethod="")
-	public DataSource jndiDataSource() throws IllegalArgumentException, NamingException {
+    @Bean
+    public DataSources getDataSources() {
+    	return new DataSources() {
+    		
+			@Override
+			public DataSource getDataSource(String db) throws IllegalArgumentException, NamingException {
+				return jndiDataSources().get(db);
+			}
+    		
+    	};
+    }
+	
+	@Bean(destroyMethod = "")
+	public HashMap<String, DataSource>jndiDataSources() throws IllegalArgumentException, NamingException {
+		HashMap<String, DataSource> dataSources = new HashMap<String, DataSource>();
+		
+		// NOTE: these datasources must be defined in the TomcatEmbeddedServletContainerFactory bean's postProcessContext() method above.
+		
+		// Abc datasource
 		JndiObjectFactoryBean bean = new JndiObjectFactoryBean();
-		bean.setJndiName("java:comp/env/jdbc/myDataSource");
+		bean.setJndiName(String.format("java:comp/env/%s", env.getProperty("jdbc.abc.datasource.name")));
 		bean.setProxyInterface(DataSource.class);
-		bean.setLookupOnStartup(false);
+		bean.setLookupOnStartup(true);
 		bean.afterPropertiesSet();
-		return (DataSource)bean.getObject();
+		dataSources.put(env.getProperty("jdbc.abc.datasource.name"), (DataSource) bean.getObject());
+		
+		// other datasources ...
+		
+		return dataSources;		
 	}
-
+	
 }

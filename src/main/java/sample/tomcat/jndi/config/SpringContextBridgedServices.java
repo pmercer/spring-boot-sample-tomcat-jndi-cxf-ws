@@ -7,5 +7,5 @@ package sample.tomcat.jndi.config;
  * @see https://blog.jdriven.com/2015/03/using-spring-managed-bean-in-non-managed-object/
  */
 public interface SpringContextBridgedServices {
-	SampleUtilService getSampleUtilService();
+	DataSourceService getDataSourceService();
 }
